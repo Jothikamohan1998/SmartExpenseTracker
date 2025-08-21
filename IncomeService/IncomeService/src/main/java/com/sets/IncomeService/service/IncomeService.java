@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.sets.IncomeService.dao.IncomeDAO;
+import com.sets.IncomeService.model.Globals;
 import com.sets.IncomeService.model.IncomeDTO;
 import com.sets.IncomeService.model.IncomeDetails;
 
@@ -18,13 +18,14 @@ public class IncomeService {
 	@Autowired
 	private IncomeDAO incomeDAO;
 	
+	@Autowired
+	private Globals globals;
 	
 	public String addIncome(IncomeDTO incomeDTO) {
-		String useremail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		System.out.println("datas in service : "+useremail+"  "+incomeDTO.getIncomeDate()+" "+incomeDTO.getAmount());
+		System.out.println("datas in service : "+globals.getCurrentuser()+"  "+incomeDTO.getIncomeDate()+" "+incomeDTO.getAmount());
 		IncomeDetails incomeDetails = new IncomeDetails();
 		incomeDetails.setSource(incomeDTO.getSource());
-		incomeDetails.setEmail(useremail);
+		incomeDetails.setEmail(globals.getCurrentuser());
 		incomeDetails.setDescription(incomeDTO.getDescription());
 		incomeDetails.setAmount(incomeDTO.getAmount());
 		incomeDetails.setIncomeDate(incomeDTO.getIncomeDate());
@@ -34,26 +35,11 @@ public class IncomeService {
 		return "income details added";
 	}
 
-	public List<IncomeDetails> fetchIncomeDetails(String email) {
-		List<IncomeDetails> incomeDetails = incomeDAO.findByEmail(email);
-		return incomeDetails;
-	}
-
-
-	public IncomeDetails getIncomeById(Long id) {
-		IncomeDetails incomeDetails = incomeDAO.findById(id).orElse(null);
-		System.out.println("date : "+incomeDetails.getIncomeDate());
-		return incomeDetails;
-	}
-
 	public String updateIncomeDB(IncomeDTO incomeDTO) {
 		System.out.println("getAmount : "+incomeDTO.getAmount()+" id "+incomeDTO.getId());
 		IncomeDetails incomeDetails = incomeDAO.findById(incomeDTO.getId()).orElse(null);
-		if(incomeDetails==null) {
-			return "Record not found";
-		}
 		incomeDetails.setSource(incomeDTO.getSource());
-		incomeDetails.setEmail(incomeDTO.getEmail());
+		incomeDetails.setEmail(globals.getCurrentuser());
 		incomeDetails.setDescription(incomeDTO.getDescription());
 		incomeDetails.setAmount(incomeDTO.getAmount());
 		incomeDetails.setIncomeDate(incomeDTO.getIncomeDate());
@@ -76,6 +62,7 @@ public class IncomeService {
 		List<IncomeDTO> incomeDTOls =  new ArrayList<>();
 		for(IncomeDetails income : ls) {
 			IncomeDTO incomeDTO  = new IncomeDTO();
+			incomeDTO.setId(income.getId());
 			incomeDTO.setSource(income.getSource());
 			incomeDTO.setAmount(income.getAmount());
 			incomeDTO.setDescription(income.getDescription());

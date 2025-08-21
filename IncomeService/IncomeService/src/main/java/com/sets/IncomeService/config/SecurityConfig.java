@@ -12,17 +12,6 @@ import com.sets.IncomeService.security.JwtAuthFilter;
 @Configuration
 public class SecurityConfig {
 
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//		http.csrf(csrf-> csrf.disable())
-//		    .authorizeHttpRequests(auth->auth.requestMatchers("/income").authenticated().anyRequest().permitAll())
-//		    .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-//		    .formLogin(formLogin->formLogin.disable())
-//		    .httpBasic(httpbasic->httpbasic.disable());
-//	    http.addFilterBefore(new JwtValidationFilter(), UsernamePasswordAuthenticationFilter.class);
-//
-//		return http.build();
-	
 	private final JwtAuthFilter jwtAuthFilter;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {

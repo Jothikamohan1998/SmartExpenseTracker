@@ -1,7 +1,6 @@
 package com.sets.RegisterLoginService.contoller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,10 +35,6 @@ public class RegisterController {
 	
 	@Autowired
 	private RegisterService registerService;
-	
-//	calling other services 
-//	@Value("${custom.gateway-url}")
-//	private String gatewayUrl;
 	
 	@GetMapping("/")
 	public String home(Model model)
@@ -112,15 +107,23 @@ public class RegisterController {
 	        	return "login";
 	        }
     }
-//
-//	@GetMapping("/add-income")
-//	public String redirectToIncomeService() {
-//	    return "redirect:" + gatewayUrl + "/income";
-//	}
+
 	@GetMapping("/dashboard")
 	public String ShowDashboard() {
 		System.out.println("inside show dashboard");
 	    return "dashboard";
+	}
+	
+	@GetMapping("/logout")
+	public String Logout(HttpServletResponse response)
+	{
+		Cookie cookie = new Cookie("jwt", null);
+		cookie.setHttpOnly(true);
+	    cookie.setPath("/");
+	    cookie.setMaxAge(0); // delete cookie
+	    response.addCookie(cookie);
+
+	    return "redirect:/login-register/login";
 	}
 	
 }

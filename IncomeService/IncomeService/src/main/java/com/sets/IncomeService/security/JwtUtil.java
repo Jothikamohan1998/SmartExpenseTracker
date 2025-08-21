@@ -26,11 +26,6 @@ public class JwtUtil {
     private int jwtExpirationMs;
     private SecretKey key;
 
-//    @PostConstruct
-//    public void init() {
-//        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-//    }
-    
     @PostConstruct
     public void init() {
     	this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
