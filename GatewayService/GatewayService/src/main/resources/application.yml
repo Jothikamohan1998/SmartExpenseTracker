@@ -1,0 +1,31 @@
+server:
+  port: 8076
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.filter: DEBUG
+    reactor.netty.http.client: DEBUG
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: RegisterLoginService
+          uri: http://localhost:8080
+          predicates:
+            - Path=/login-register/, /login-register/**, /login-register/login, /login-register/register
+          filters:
+            - StripPrefix=0  # Important: keeps original path like /login
+
+        - id: IncomeService
+          uri: http://localhost:8081
+          predicates:
+            - Path=/income/**
+          filters:
+            - StripPrefix=0  # So /income/abc becomes /abc
+
+# Remove this - it breaks things
+# default-filters:
+#   - AddRequestHeader=Authorization, #{token}

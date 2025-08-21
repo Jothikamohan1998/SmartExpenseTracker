@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Income Dashboard - Smart Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Smart Expense Tracker</a>
+        <div class="d-flex">
+            <a class="btn btn-outline-light" onclick="location.href='/login-register/dashboard'">Dashboard</a>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+
+    <!-- Header + Add Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Your Incomes</h3>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addIncomeModal">
+            ➕ Add Income
+        </button>
+    </div>
+
+    <!-- Income Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Source</th>
+                <th>Amount (₹)</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="income : ${incomes}">
+                <td th:text="${income.source}"></td>
+                <td th:text="${income.amount}"></td>
+                <td th:text="${income.description}"></td>
+                <td th:text="${#temporals.format(income.incomeDate, 'dd-MMM-yyyy')}"></td>
+                <td>
+                    <!-- Edit Button -->
+                    <button class="btn btn-warning btn-sm" 
+                            data-bs-toggle="modal" 
+                            th:attr="data-bs-target='#editIncomeModal__${income.id}'">
+                        ✏️ Edit
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button class="btn btn-danger btn-sm" 
+                            data-bs-toggle="modal" 
+                            th:attr="data-bs-target='#deleteIncomeModal__${income.id}'">
+                        🗑 Delete
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Add Income Modal -->
+<div class="modal fade" id="addIncomeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/income/add-income}" th:object="${income}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Income</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Source</label>
+                        <input type="text" name="source" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount (₹)</label>
+                        <input type="number" name="amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="incomeDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Income Modal (per row) -->
+<div th:each="income : ${incomes}">
+    <div class="modal fade" th:id="'editIncomeModal__' + ${income.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/income/update}" method="post">
+                    <input type="hidden" name="id" th:value="${income.id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Income</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Source</label>
+                            <input type="text" name="source" class="form-control" th:value="${income.source}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount (₹)</label>
+                            <input type="number" name="amount" class="form-control" th:value="${income.amount}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" th:text="${income.description}"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="incomeDate" class="form-control" th:value="${income.incomeDate}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Income Modal (per row) -->
+<div th:each="income : ${incomes}">
+    <div class="modal fade" th:id="'deleteIncomeModal__' + ${income.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/income/delete}" method="post">
+                    <input type="hidden" name="id" th:value="${income.id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger">Delete Income</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this income?</p>
+                        <p><strong th:text="${income.source}"></strong> - ₹<span th:text="${income.amount}"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
