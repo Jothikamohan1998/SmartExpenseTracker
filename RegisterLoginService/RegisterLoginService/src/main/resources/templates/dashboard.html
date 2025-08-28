@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,129 +9,153 @@
 </head>
 <body class="bg-light">
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Smart Expense Tracker</a>
-        <div class="d-flex">
-            <button class="btn btn-outline-light me-2" onclick="location.href='/income'">Income Details</button>
-            <button class="btn btn-outline-light me-2" onclick="location.href='/add-expense'">Expense Details</button>
-            <a class="btn btn-danger" onclick="location.href='/login-register/logout'">Logout</a>
-        </div>
-    </div>
-</nav>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Smart Expense Tracker</a>
+			<div class="d-flex">
+				<button class="btn btn-outline-light me-2"
+					onclick="location.href='/income'">Income Details</button>
+				<button class="btn btn-outline-light me-2"
+					onclick="location.href='/expense'">Expense Details</button>
+				<a class="btn btn-danger"
+					onclick="location.href='/login-register/logout'">Logout</a>
+			</div>
+		</div>
+	</nav>
+	<div class="container mt-4">
+		<!-- 🔹 Filter Section -->
+		<form method="get" action="/login-register/dashboard"
+			class="row g-3 mb-4 align-items-center">
+			<div class="col-md-1">
+				<label for="fromDate" class="col-form-label">From Date</label>
+			</div>
+			<div class="col-md-2">
+				<input type="date" id="fromDate" class="form-control"
+					name="fromDate" th:value="${fromDate}"
+					max="${#dates.format(minday, 'yyyy-MM-dd')}">
+			</div>
+			<div class="col-md-1">
+				<label for="toDate" class="col-form-label">To Date</label>
+			</div>
+			<div class="col-md-2">
+				<input type="date" id="toDate" class="form-control" name="toDate"
+					th:value="${toDate}" max="${#dates.format(maxday, 'yyyy-MM-dd')}">
+			</div>
+			<div class="col-md-2">
+				<button class="btn btn-primary w-100" type="submit">Filter</button>
+			</div>
+		</form>
+		<!-- Summary Cards -->
+		<div class="row g-3">
+			<div class="col-md-4">
+				<div class="card text-white bg-success shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">Total Income</h5>
+						<h3 th:text="${totalIncome}">₹0</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card text-white bg-danger shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">Total Expenses</h5>
+						<h3 th:text="${totalExpense}">₹0</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card text-white bg-primary shadow-sm">
+					<div class="card-body">
+						<h5 class="card-title">Net Balance</h5>
+						<h3 th:text="${netBalance}">₹0</h3>
+					</div>
+				</div>
+			</div>
+		</div>
 
-<div class="container mt-4">
+		<!-- Charts Section -->
+		<div class="row mt-4">
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header bg-white fw-bold">Income vs Expenses</div>
+					<div class="card-body">
+						<canvas id="incomeExpenseChart"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header bg-white fw-bold">Expense Breakdown</div>
+					<div class="card-body">
+						<canvas id="categoryChart"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <!-- Summary Cards -->
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card text-white bg-success shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Total Income</h5>
-                    <h3 th:text="${totalIncome}">₹0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-danger shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Total Expenses</h5>
-                    <h3 th:text="${totalExpense}">₹0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-primary shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Net Balance</h5>
-                    <h3 th:text="${netBalance}">₹0</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-bold">Income vs Expenses</div>
-                <div class="card-body">
-                    <canvas id="incomeExpenseChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-bold">Expense Breakdown</div>
-                <div class="card-body">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Transactions Table -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white fw-bold">Recent Transactions</div>
-                <div class="card-body table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="tx : ${recentTransactions}">
-                                <td th:text="${tx.date}">2025-08-01</td>
-                                <td th:text="${tx.type}">Income</td>
-                                <td th:text="${tx.category}">Salary</td>
-                                <td th:text="${tx.amount}">₹10,000</td>
-                                <td th:text="${tx.description}">August Salary</td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(recentTransactions)}">
-                                <td colspan="5" class="text-center">No transactions found</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Chart.js Example Script -->
-<script>
+		<!-- Recent Transactions Table -->
+		
+		<div class="row mt-4">
+			<div class="col-md-12">
+				<div class="card shadow-sm">
+					<div class="card-header bg-white fw-bold">Recent Transactions</div>
+					<div class="card-body table-responsive">
+						<table class="table table-bordered align-middle">
+							<thead class="table-light">
+								<tr>
+									<th>Date</th>
+									<th>Type</th>
+									<th>Category</th>
+									<th>Amount</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="tx : ${recentTransactions}">
+									<td th:text="${tx.date}"></td>
+									<td th:text="${tx.type}"></td>
+									<td th:text="${tx.category}"></td>
+									<td th:text="${tx.amount}"></td>
+									<td th:text="${tx.description}"></td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(recentTransactions)}">
+									<td colspan="5" class="text-center">No transactions found</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Chart.js Dynamic Script -->
+	<script th:inline="javascript">
     const incomeExpenseChart = new Chart(document.getElementById('incomeExpenseChart'), {
         type: 'bar',
         data: {
             labels: ['Income', 'Expense'],
             datasets: [{
                 label: 'Amount',
-                data: [120000, 55000], // replace with Thymeleaf data later
+                data: [ [[${totalIncome}]], [[${totalExpense}]] ],  // ✅ Dynamic values
                 backgroundColor: ['#198754', '#dc3545']
             }]
         }
     });
-
+    const catdetails = [[${catdetails}]]; 
+    const categories = catdetails.map(item => item.category);
+    const categoryAmounts = catdetails.map(item => item.amount);
+    
     const categoryChart = new Chart(document.getElementById('categoryChart'), {
-        type: 'pie',
+    	type: 'pie',
         data: {
-            labels: ['Food', 'Rent', 'Travel', 'Bills'],
+            labels: categories,
             datasets: [{
-                data: [2000, 15000, 3000, 2500],
+                data: categoryAmounts,
                 backgroundColor: ['#ffc107', '#0d6efd', '#20c997', '#6f42c1']
             }]
         }
     });
 </script>
-
 </body>
 </html>

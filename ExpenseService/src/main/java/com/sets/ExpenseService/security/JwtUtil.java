@@ -1,4 +1,4 @@
-package com.sets.RegisterLoginService.security;
+package com.sets.ExpenseService.security;
 
 import java.util.Date;
 
@@ -28,8 +28,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // Decode Base64 key
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    	this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
     
     // Generate JWT token

@@ -12,20 +12,23 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: RegisterLoginService
-          uri: http://localhost:8080
+        - id: login-service
+          uri: lb://RegisterLoginService    # service name from Eureka
           predicates:
-            - Path=/login-register/, /login-register/**, /login-register/login, /login-register/register
+            - Path=/login-register/**       # single predicate covers all paths
           filters:
-            - StripPrefix=0  # Important: keeps original path like /login
+            - StripPrefix=0                 # keep /login-register/... as-is
 
-        - id: IncomeService
-          uri: http://localhost:8081
+        - id: income-service
+          uri: lb://IncomeService           # service name from Eureka
           predicates:
-            - Path=/income/**
+            - Path=/income/**               # Gateway route
           filters:
-            - StripPrefix=0  # So /income/abc becomes /abc
+            - StripPrefix=0
 
-# Remove this - it breaks things
-# default-filters:
-#   - AddRequestHeader=Authorization, #{token}
+        - id: expense-service
+          uri: lb://ExpenseService          # service name from Eureka
+          predicates:
+            - Path=/expense/**              # Gateway route
+          filters:
+            - StripPrefix=0
